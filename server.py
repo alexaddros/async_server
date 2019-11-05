@@ -11,7 +11,7 @@ print('Start Server\n')
 
 while True:
         data, address = server.recvfrom(1024)
-        if data.decode().split("---_---")[0-1] == "USERINFO":
+        if data.decode().split("---_---")[-1] == "USERINFO":
                 clients.append(address)
                 nickname, password = data.decode().split("---_---")
                 if nickname not in authorization.get_nicknames():
