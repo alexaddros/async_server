@@ -1,19 +1,33 @@
+import hashlib
 import socket
 
-sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-sock.bind (('skopcovs1.fvds.ru', 9090))
+import authorization
 
-client = [] # Массив, где храним адреса клиентов
-print ('Start Server\n')
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server.bind(('skopcovs1.fvds.ru', 9090))
+clients = []
+
+print('Start Server\n')
 
 while True:
-        data , addres = sock.recvfrom(1024)
-        if  addres not in client : 
-                client.append(addres)
-                print("------------")
-                print("Nickname:", data.split()[0].decode("utf-8"), "\nIP:      ", addres[0])
-                print("------------\n")
-        for clients in client :
-                if clients == addres: 
-                    continue # Не отправлять данные клиенту который их прислал
-                sock.sendto(data,clients)	
+        data, address = server.recvfrom(1024)
+        if data.decode().split("---_---")[0-1] == "USERINFO":
+                clients.append(address)
+                nickname, password = data.decode().split("---_---")
+                if nickname not in authorization.get_nicknames():
+                    new_user_created = authorization.create_new(nickname,
+                                                                hashlib.sha1(password.encode('utf-8')).hexdigest())
+                    if new_user_created:
+                        for client in clients:
+                            if client == address:
+                                continue
+                            server.sendto(f'------------ {nickname} connected to server ------------'.encode('utf-8'),
+                                          client)
+                else:
+                    if authorization.authorize(nickname, hashlib.sha1(password.encode('utf-8')).hexdigest()):
+                        server.sendto('SUCCESS'.encode('utf-8'), address)
+        else:
+            for client in clients:
+                    if client == address:
+                        continue
+                    server.sendto(data, client)
