@@ -8,9 +8,9 @@ users = sqlite3.connect('C:/Users/skopc/Desktop/media/Lyceum_Yandex/Second_Era/T
 cursor = users.cursor()
 
 def create_new(nickname, password_hash):
-    names = cursor.execute("""SELECT nickname FROM user""").fetchall()
+    names = cursor.execute("""SELECT name FROM user""").fetchall()
     if nickname not in [name[0] for name in names]:
-        cursor.execute(f"""INSERT INTO user VALUES('{nickname}', '{password_hash}')""")
+        cursor.execute("""INSERT INTO user VALUES(?, ?)""", (nickname, password_hash))
         users.commit()
         return True
     else:
