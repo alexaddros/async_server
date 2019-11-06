@@ -21,7 +21,7 @@ while True:
                         for client in clients:
                             if client == address:
                                 continue
-                            server.sendto(f'------------ {nickname} connected to server ------------'.encode('utf-8'),
+                            server.sendto('------------', nickname, 'connected to server ------------'.encode('utf-8'),
                                           client)
                 else:
                     if authorization.authorize(nickname, hashlib.sha1(password.encode('utf-8')).hexdigest()):
@@ -29,7 +29,7 @@ while True:
                         for client in clients:
                             if client == address:
                                 continue
-                            server.sendto(f'------------ {nickname} connected to server ------------'.encode('utf-8'),
+                            server.sendto('------------', nickname, 'connected to server ------------'.encode('utf-8'),
                                           client)
         else:
             for client in clients:
